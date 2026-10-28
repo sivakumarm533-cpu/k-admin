@@ -1,6 +1,14 @@
+import { useNavigate } from "react-router-dom";
+import StockStatus from "../components/stockstatus";
+import useAuth from "../context/useAuth";
 
 function Home() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   return (
+    <>
+
     <section className="dashboard-page">
       <div className="page-heading">
         <div>
@@ -11,7 +19,11 @@ function Home() {
           </p>
         </div>
 
-        <button type="button">Add product</button>
+        {user?.role === "admin" && (
+          <button type="button" onClick={() => navigate("/products/new")}>
+            Add product
+          </button>
+        )}
       </div>
 
       <div className="dashboard-card">
@@ -22,6 +34,8 @@ function Home() {
         </p>
       </div>
     </section>
+      <StockStatus />
+    </>
   );
 }
  

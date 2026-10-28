@@ -1,68 +1,70 @@
-import { useEffect, useState } from 'react'
-import Navbar from './components/Navbar'
-import SideMenu from './components/SideMenu'
+import { useState } from 'react'
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import Navbar from './components/navbar'
+import SideMenu from './components/sidemenu'
+import StockStatus from './components/stockstatus'
+import EditProduct from './components/EditProduct'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import Categories from './pages/Categories'
 import Orders from './pages/Orders'
-import StockStatus from './components/StockStatus'
 import Settings from './pages/Settings'
+import Login from './pages/Login'
+import RequireAuth from './components/RequireAuth'
+import AuthProvider from './context/AuthProvider'
+import useAuth from './context/useAuth'
 import './App.css'
 
-function App() {
-  const [currentPath, setCurrentPath] = useState(window.location.pathname)
+function AppLayout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, logout } = useAuth()
 
-  useEffect(() => {
-    function handleBackOrForward() {
-      setCurrentPath(window.location.pathname)
-    }
-
-    window.addEventListener('popstate', handleBackOrForward)
-    return () => window.removeEventListener('popstate', handleBackOrForward)
-  }, [])
-
-  function navigate(path) {
-    window.history.pushState({}, '', path)
-    setCurrentPath(path)
+  function closeMenu() {
     setIsMenuOpen(false)
-  }
-
-  let page
-
-  if (currentPath === '/' || currentPath === '/dashboard') {
-    page = <Home />
-  } else if (currentPath === '/products') {
-    page = <Products />
-  } else if (currentPath === '/categories') {
-    page = <Categories />
-  } else if (currentPath === '/orders') {
-    page = <Orders />
-  } else if (currentPath === '/stock-status') {
-    page = <StockStatus />
-  } else if (currentPath === '/settings') {
-    page = <Settings />
-  } else {
-    page = <h1>Page not found</h1>
   }
 
   return (
     <div className="admin-layout">
       <Navbar
-        onMenuClick={() => setIsMenuOpen((isOpen) => !isOpen)}
-        onNavigate={navigate}
+        user={user}
+        onLogout={logout}
+        onMenuClick={() => setIsMenuOpen((open) => !open)}
       />
       <div className="admin-body">
-        <SideMenu
-          currentPath={currentPath}
-          isOpen={isMenuOpen}
-          onNavigate={navigate}
-        />
+        <SideMenu isOpen={isMenuOpen} onNavigate={closeMenu} />
         <main className="admin-content" id="main-content">
-          {page}
+          <Outlet />
         </main>
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route element={<RequireAuth />}>
+            <Route element={<AppLayout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Home />} />
+              <Route path="products" element={<Products />} />
+              <Route element={<RequireAuth role="admin" />}>
+                <Route path="products/new" element={<EditProduct />} />
+                <Route path="products/:id/edit" element={<EditProduct />} />
+              </Route>
+              <Route path="categories" element={<Categories />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="stock-status" element={<StockStatus />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="*" element={<h1>Page not found</h1>} />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 
