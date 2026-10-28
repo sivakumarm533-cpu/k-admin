@@ -1,30 +1,37 @@
-const menuItems = [
-  { label: 'Dashboard', href: '#dashboard', icon: '⌂' },
-  { label: 'Products', href: '#products', icon: '▦' },
-  { label: 'Categories', href: '#categories', icon: '◫' },
-  { label: 'Orders', href: '#orders', icon: '▤' },
-  { label: 'Stock Status', href: '#stock-status', icon: '▥' },
-  { label: 'Settings', href: '#settings', icon: '⚙' },
-]
 
-function SideMenu({ isOpen, onNavigate }) {
+const menuItems = [
+  { label: "Dashboard", path: "/dashboard", icon: "⌂" },
+  { label: "Products", path: "/products", icon: "▦" },
+  { label: "Categories", path: "/categories", icon: "◫" },
+  { label: "Orders", path: "/orders", icon: "▤" },
+  { label: "Stock Status", path: "/stock-status", icon: "▥" },
+  { label: "Settings", path: "/settings", icon: "⚙" },
+];
+
+function SideMenu({ currentPath, isOpen, onNavigate }) {
   return (
     <aside
-      aria-label="Main navigation"
-      className={`admin-sidebar${isOpen ? ' is-open' : ''}`}
       id="admin-sidebar"
+      aria-label="Main navigation"
+      className={`admin-sidebar ${isOpen ? "is-open" : ""}`}
     >
       <nav>
         <ul className="sidebar-links">
-          {menuItems.map((item, index) => (
-            <li key={item.label}>
+          {menuItems.map((item) => (
+            <li key={item.path}>
               <a
-                aria-current={index === 0 ? 'page' : undefined}
-                className={index === 0 ? 'sidebar-link is-active' : 'sidebar-link'}
-                href={item.href}
-                onClick={onNavigate}
+                href={item.path}
+                onClick={(event) => {
+                  event.preventDefault()
+                  onNavigate(item.path)
+                }}
+                aria-current={currentPath === item.path ? 'page' : undefined}
+                className={`sidebar-link ${currentPath === item.path ? 'is-active' : ''}`}
               >
-                <span aria-hidden="true" className="sidebar-icon">{item.icon}</span>
+                <span className="sidebar-icon" aria-hidden="true">
+                  {item.icon}
+                </span>
+
                 <span>{item.label}</span>
               </a>
             </li>
@@ -32,7 +39,7 @@ function SideMenu({ isOpen, onNavigate }) {
         </ul>
       </nav>
     </aside>
-  )
+  );
 }
 
-export default SideMenu
+export default SideMenu;

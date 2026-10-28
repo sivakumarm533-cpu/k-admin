@@ -1,49 +1,58 @@
+
 const stockLevels = [
-  { label: 'In stock', count: 128, total: 160, tone: 'in-stock' },
-  { label: 'Low stock', count: 24, total: 160, tone: 'low-stock' },
-  { label: 'Out of stock', count: 8, total: 160, tone: 'out-of-stock' },
-]
+  { label: "In stock", count: 128, tone: "in-stock" },
+  { label: "Low stock", count: 24, tone: "low-stock" },
+  { label: "Out of stock", count: 8, tone: "out-of-stock" },
+];
 
 function StockStatus() {
+  const total = stockLevels.reduce(
+    (sum, level) => sum + level.count,
+    0
+  );
+
   return (
-    <section aria-labelledby="stock-status-title" className="stock-status-card" id="stock-status">
+    <section className="stock-status-card">
       <div className="stock-status-heading">
         <div>
-          <h2 id="stock-status-title">Stock status</h2>
+          <h1>Stock status</h1>
           <p>Inventory levels across your products</p>
         </div>
-        <span className="stock-total">160 products</span>
+
+        <span className="stock-total">{total} products</span>
       </div>
 
       <div className="stock-status-list">
         {stockLevels.map((level) => {
-          const percentage = Math.round((level.count / level.total) * 100)
+          const percentage = Math.round(
+            (level.count / total) * 100
+          );
 
           return (
             <div className="stock-status-row" key={level.tone}>
               <div className="stock-status-labels">
                 <span className="stock-status-label">
-                  <span aria-hidden="true" className={`stock-dot ${level.tone}`} />
+                  <span className={`stock-dot ${level.tone}`} />
                   {level.label}
                 </span>
-                <span className="stock-status-count">{level.count} <span>({percentage}%)</span></span>
+
+                <span className="stock-status-count">
+                  {level.count} ({percentage}%)
+                </span>
               </div>
-              <div
-                aria-label={`${level.label}: ${level.count} of ${level.total} products`}
-                className="stock-bar-track"
-                role="img"
-              >
+
+              <div className="stock-bar-track">
                 <span
                   className={`stock-bar-fill ${level.tone}`}
                   style={{ width: `${percentage}%` }}
                 />
               </div>
             </div>
-          )
+          );
         })}
       </div>
     </section>
-  )
+  );
 }
 
-export default StockStatus
+export default StockStatus;
